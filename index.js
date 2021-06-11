@@ -1,6 +1,11 @@
 const express = require("express");
+const morgan = require("morgan");
+
 const app = express();
 
+app.use(morgan(":method :url :status - :response-time ms"));
+
+// json-parser middleware
 app.use(express.json());
 
 let persons = [
@@ -91,6 +96,14 @@ app.post("/api/persons/", (req, res) => {
     return res.json(person);
   }
 });
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({
+    error: "unknown endpoint",
+  });
+};
+
+app.use(unknownEndpoint);
 
 const PORT = 4000;
 app.listen(PORT, () => {
