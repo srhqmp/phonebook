@@ -1,0 +1,39 @@
+GET http://localhost:4000/info
+
+###
+
+GET http://localhost:4000/api/persons/
+
+###
+
+DELETE http://localhost:4000/api/persons/2
+
+###
+
+POST http://localhost:4000/api/persons/
+Content-Type: application/json
+
+{
+    "name": "",
+    "number": "23232-23232-2323"
+}
+
+###
+
+POST http://localhost:4000/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Sarah Kim",
+    "number": ""
+}
+
+###
+
+POST http://localhost:4000/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Sarah Jane",
+    "number": "23232-23232-2323"
+}
