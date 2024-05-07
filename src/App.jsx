@@ -37,26 +37,43 @@ const App = () => {
     });
   };
 
+  const reset = () => {
+    setNewName("");
+    setNewNumber("");
+  };
+
   const onSubmit = (event) => {
     event.preventDefault();
 
     const personExists = persons.find(
       (p) => p.name.toLowerCase().trim() === newName.toLowerCase().trim()
     );
-    if (personExists) {
-      alert(`${newName} is already added to phonebook`);
-    } else {
-      const person = {
-        name: newName,
-        number: newNumber,
-      };
 
-      personService.create(person).then((res) => {
-        setPersons((curr) => [...curr, res.data]);
-        setNewName("");
-        setNewNumber("");
-      });
+    const person = {
+      name: newName,
+      number: newNumber,
+    };
+
+    if (personExists) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        personService.update(personExists.id, person).then((res) => {
+          setPersons((curr) =>
+            curr.map((p) => (p.id === res.data.id ? res.data : p))
+          );
+          reset();
+        });
+      }
+      return;
     }
+
+    personService.create(person).then((res) => {
+      setPersons((curr) => [...curr, res.data]);
+      reset();
+    });
   };
 
   const filteredPersons = persons
