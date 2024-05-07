@@ -33,11 +33,22 @@ const App = () => {
   };
 
   const handleDelete = (person) => {
-    personService.deleteOne(person.id).then(() => {
-      const updatedPersons = persons.filter((p) => p.id !== person.id);
-      setPersons(updatedPersons);
-      displayNotification(`Deleted ${person.name}`, "success");
-    });
+    personService
+      .deleteOne(person.id)
+      .then(() => {
+        const updatedPersons = persons.filter((p) => p.id !== person.id);
+        setPersons(updatedPersons);
+        displayNotification(`Deleted ${person.name}`, "success");
+      })
+      .catch((err) => {
+        console.error(err);
+        displayNotification(
+          `Information of ${person.name} has already been removed from server`,
+          "error"
+        );
+        const updatedPersons = persons.filter((p) => p.id !== person.id);
+        setPersons(updatedPersons);
+      });
   };
 
   const displayNotification = (message, variant) => {
