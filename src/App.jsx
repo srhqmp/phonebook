@@ -30,6 +30,13 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
+  const handleDelete = (id) => {
+    personService.deleteOne(id).then(() => {
+      const updatedPersons = persons.filter((p) => p.id !== id);
+      setPersons(updatedPersons);
+    });
+  };
+
   const onSubmit = (event) => {
     event.preventDefault();
 
@@ -71,7 +78,7 @@ const App = () => {
         handleNumber={handleNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} handleDelete={handleDelete} />
     </div>
   );
 };
