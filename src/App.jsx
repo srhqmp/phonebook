@@ -19,6 +19,18 @@ const App = () => {
     });
   }, []);
 
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+
+  const handleName = (event) => {
+    setNewName(event.target.value);
+  };
+
+  const handleNumber = (event) => {
+    setNewNumber(event.target.value);
+  };
+
   const onSubmit = (event) => {
     event.preventDefault();
 
@@ -31,11 +43,13 @@ const App = () => {
       const person = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1,
       };
-      setPersons((curr) => [...curr, person]);
-      setNewName("");
-      setNewNumber("");
+
+      axios.post(url, person).then((res) => {
+        setPersons((curr) => [...curr, res.data]);
+        setNewName("");
+        setNewNumber("");
+      });
     }
   };
 
@@ -44,18 +58,6 @@ const App = () => {
         p.name.toLowerCase().includes(search.toLocaleLowerCase())
       )
     : [];
-
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-  };
-
-  const handleName = (event) => {
-    setNewName(event.target.value);
-  };
-
-  const handleNumber = (event) => {
-    setNewNumber(event.target.value);
-  };
 
   return (
     <div>
