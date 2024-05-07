@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 
-const url = "/persons";
+import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState(null);
@@ -14,7 +13,7 @@ const App = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get(url).then((res) => {
+    personService.getAll().then((res) => {
       setPersons(res.data);
     });
   }, []);
@@ -45,7 +44,7 @@ const App = () => {
         number: newNumber,
       };
 
-      axios.post(url, person).then((res) => {
+      personService.create(person).then((res) => {
         setPersons((curr) => [...curr, res.data]);
         setNewName("");
         setNewNumber("");
