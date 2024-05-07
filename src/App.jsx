@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 
 import personService from "./services/persons";
 
@@ -11,6 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [notification, setNotification] = useState(null); // {message: "", variant: ""}
 
   useEffect(() => {
     personService.getAll().then((res) => {
@@ -30,11 +32,19 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
-  const handleDelete = (id) => {
-    personService.deleteOne(id).then(() => {
-      const updatedPersons = persons.filter((p) => p.id !== id);
+  const handleDelete = (person) => {
+    personService.deleteOne(person.id).then(() => {
+      const updatedPersons = persons.filter((p) => p.id !== person.id);
       setPersons(updatedPersons);
+      displayNotification(`Deleted ${person.name}`, "success");
     });
+  };
+
+  const displayNotification = (message, variant) => {
+    setNotification({ message, variant });
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
   };
 
   const reset = () => {
@@ -64,6 +74,7 @@ const App = () => {
           setPersons((curr) =>
             curr.map((p) => (p.id === res.data.id ? res.data : p))
           );
+          displayNotification(`Updated ${res.data.name}`, "success");
           reset();
         });
       }
@@ -72,6 +83,7 @@ const App = () => {
 
     personService.create(person).then((res) => {
       setPersons((curr) => [...curr, res.data]);
+      displayNotification(`Added ${res.data.name}`, "success");
       reset();
     });
   };
@@ -84,7 +96,8 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification notification={notification} />
       <Filter value={search} handleSearch={handleSearch} />
       <h2>Add a new</h2>
       <PersonForm
