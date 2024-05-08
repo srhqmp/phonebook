@@ -105,6 +105,21 @@ app.delete("/api/persons/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id;
+
+  const person = {
+    name: req.body.name,
+    number: req.body.number,
+  };
+
+  Person.findByIdAndUpdate(id, person, { new: true })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((err) => next(err));
+});
+
 app.use(middlewares.unknownEndpoint);
 app.use(middlewares.errorHandler);
 
