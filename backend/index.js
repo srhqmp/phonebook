@@ -1,9 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-require("dotenv").config();
 
 const middlewares = require("./middlewares/index.js");
+const Person = require("./models/person.js");
 
 const app = express();
 
@@ -12,7 +13,7 @@ morgan.token("req-body", function (req, res) {
 });
 
 app.use(cors());
-app.use(express.static('dist'))
+app.use(express.static("dist"));
 app.use(express.json());
 app.use(
   morgan(
@@ -46,16 +47,20 @@ let persons = [
 const generateId = () => Math.floor(Math.random() * 100) + 1;
 
 app.get("/info", (req, res) => {
-  res.send(
-    `<div>
-      <p>Phonebook has info for ${persons.length} persons</p>
-      <p>${new Date()}</p>
-    </div>`
-  );
+  Person.find({}).then((persons) => {
+    res.send(
+      `<div>
+        <p>Phonebook has info for ${persons.length} persons</p>
+        <p>${new Date()}</p>
+      </div>`
+    );
+  });
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then((persons) => {
+    res.json(persons);
+  });
 });
 
 app.post("/api/persons", (req, res) => {
