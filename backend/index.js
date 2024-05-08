@@ -96,10 +96,15 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
 
-  persons = persons.filter((n) => n.id !== id);
-  res.status(204).end();
+  Person.findByIdAndDelete(id)
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch((err) => {
+      console.error(err.message);
+    });
 });
 
 app.use(middlewares.unknownEndpoint);
