@@ -49,6 +49,13 @@ app.post("/api/persons", (req, res) => {
     return res.status(400).json({ message: "Must contain name and number" });
   }
 
+  const personExist = persons.find(
+    (p) => p.name.toLocaleLowerCase().trim() === body.name.toLowerCase().trim()
+  );
+  if (personExist) {
+    return res.status(409).json({ message: "name must be unique" });
+  }
+
   const newPerson = {
     name: body.name,
     number: body.number,
