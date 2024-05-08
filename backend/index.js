@@ -21,29 +21,6 @@ app.use(
   )
 );
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 app.get("/info", (req, res) => {
   Person.find({}).then((persons) => {
     res.send(
@@ -68,12 +45,13 @@ app.post("/api/persons", (req, res) => {
     return res.status(400).json({ message: "Must contain name and number" });
   }
 
-  const personExist = persons.find(
-    (p) => p.name.toLocaleLowerCase().trim() === body.name.toLowerCase().trim()
-  );
-  if (personExist) {
-    return res.status(409).json({ message: "name must be unique" });
-  }
+  // TODO: Prevent duplicate names
+  // const personExist = persons.find(
+  //   (p) => p.name.toLocaleLowerCase().trim() === body.name.toLowerCase().trim()
+  // );
+  // if (personExist) {
+  //   return res.status(409).json({ message: "name must be unique" });
+  // }
 
   const person = new Person({
     name: body.name,
@@ -85,14 +63,14 @@ app.post("/api/persons", (req, res) => {
   });
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
+app.get("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id;
 
-  const person = persons.find((n) => n.id === id);
-  if (!person) {
-    return res.status(404).json({ message: `Person with ID ${id} not found` });
-  }
-  res.json(person);
+  Person.findById(id)
+    .then((person) => {
+      res.json(person);
+    })
+    .catch((err) => next(err));
 });
 
 app.delete("/api/persons/:id", (req, res, next) => {
