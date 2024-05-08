@@ -42,7 +42,7 @@ app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
   if (!body.name || !body.number) {
-    return res.status(400).json({ message: "Must contain name and number" });
+    return res.status(400).json({ error: "Must contain name and number" });
   }
 
   // TODO: Prevent duplicate names
