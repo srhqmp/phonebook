@@ -2,7 +2,9 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 
-let notes = [
+app.use(express.json());
+
+let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -25,33 +27,51 @@ let notes = [
   },
 ];
 
+const generateId = () => Math.floor(Math.random() * 100) + 1;
+
 app.get("/info", (req, res) => {
   res.send(
     `<div>
-      <p>Phonebook has info for ${notes.length} persons</p>
+      <p>Phonebook has info for ${persons.length} persons</p>
       <p>${new Date()}</p>
     </div>`
   );
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(notes);
+  res.json(persons);
+});
+
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+
+  if (!body.name || !body.number) {
+    return res.status(400).json({ message: "Must contain name and number" });
+  }
+
+  const newPerson = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+  persons = persons.concat(newPerson);
+  res.status(201).json(newPerson);
 });
 
 app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  const note = notes.find((n) => n.id === id);
-  if (!note) {
+  const person = persons.find((n) => n.id === id);
+  if (!person) {
     return res.status(404).json({ message: `Person with ID ${id} not found` });
   }
-  res.json(note);
+  res.json(person);
 });
 
 app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  notes = notes.filter((n) => n.id !== id);
+  persons = persons.filter((n) => n.id !== id);
   res.status(204).end();
 });
 
