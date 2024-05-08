@@ -44,8 +44,6 @@ let persons = [
   },
 ];
 
-const generateId = () => Math.floor(Math.random() * 100) + 1;
-
 app.get("/info", (req, res) => {
   Person.find({}).then((persons) => {
     res.send(
@@ -77,13 +75,14 @@ app.post("/api/persons", (req, res) => {
     return res.status(409).json({ message: "name must be unique" });
   }
 
-  const newPerson = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  };
-  persons = persons.concat(newPerson);
-  res.status(201).json(newPerson);
+  });
+
+  person.save().then((newPerson) => {
+    res.status(201).json(newPerson);
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
