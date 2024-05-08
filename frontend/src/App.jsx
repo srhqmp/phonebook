@@ -63,6 +63,11 @@ const App = () => {
     setNewNumber("");
   };
 
+  const handleError = (err) => {
+    console.error(err);
+    displayNotification(err.response.data.error, "error");
+  };
+
   const onSubmit = (event) => {
     event.preventDefault();
 
@@ -81,22 +86,28 @@ const App = () => {
           `${newName} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
-        personService.update(personExists.id, person).then((res) => {
-          setPersons((curr) =>
-            curr.map((p) => (p.id === res.data.id ? res.data : p))
-          );
-          displayNotification(`Updated ${res.data.name}`, "success");
-          reset();
-        });
+        personService
+          .update(personExists.id, person)
+          .then((res) => {
+            setPersons((curr) =>
+              curr.map((p) => (p.id === res.data.id ? res.data : p))
+            );
+            displayNotification(`Updated ${res.data.name}`, "success");
+            reset();
+          })
+          .catch((err) => handleError(err));
       }
       return;
     }
 
-    personService.create(person).then((res) => {
-      setPersons((curr) => [...curr, res.data]);
-      displayNotification(`Added ${res.data.name}`, "success");
-      reset();
-    });
+    personService
+      .create(person)
+      .then((res) => {
+        setPersons((curr) => [...curr, res.data]);
+        displayNotification(`Added ${res.data.name}`, "success");
+        reset();
+      })
+      .catch((err) => handleError(err));
   };
 
   const filteredPersons = persons
