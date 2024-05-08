@@ -95,19 +95,18 @@ app.get("/api/persons/:id", (req, res) => {
   res.json(person);
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
 
   Person.findByIdAndDelete(id)
     .then(() => {
       res.status(204).end();
     })
-    .catch((err) => {
-      console.error(err.message);
-    });
+    .catch((err) => next(err));
 });
 
 app.use(middlewares.unknownEndpoint);
+app.use(middlewares.errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
