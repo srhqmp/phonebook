@@ -25,6 +25,15 @@ const notes = [
   },
 ];
 
+app.get("/info", (req, res) => {
+  res.send(
+    `<div>
+      <p>Phonebook has info for ${notes.length} persons</p>
+      <p>${new Date()}</p>
+    </div>`
+  );
+});
+
 app.get("/api/persons", (req, res) => {
   res.json(notes);
 });
