@@ -3,6 +3,8 @@ const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
 
+const middlewares = require("./middlewares/index.js");
+
 const app = express();
 
 morgan.token("req-body", function (req, res) {
@@ -94,6 +96,8 @@ app.delete("/api/persons/:id", (req, res) => {
   persons = persons.filter((n) => n.id !== id);
   res.status(204).end();
 });
+
+app.use(middlewares.unknownEndpoint);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
