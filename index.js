@@ -2,7 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 
-const notes = [
+let notes = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -46,6 +46,13 @@ app.get("/api/persons/:id", (req, res) => {
     return res.status(404).json({ message: `Person with ID ${id} not found` });
   }
   res.json(note);
+});
+
+app.delete("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  notes = notes.filter((n) => n.id !== id);
+  res.status(204).end();
 });
 
 const PORT = process.env.PORT || 3001;
