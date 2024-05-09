@@ -1,19 +1,21 @@
 /* eslint-disable no-unused-vars */
 const mongoose = require("mongoose");
+const config = require("../utils/config.js");
+const logger = require("../utils/logger.js");
 
 mongoose.set("strictQuery", false);
 
-const url = process.env.MONGODB_URI;
+const url = config.MONGODB_URI;
 
-console.log("connecting to", url);
+logger.info("connecting to", url);
 
 mongoose
   .connect(url)
   .then((res) => {
-    console.log("connected to MongoDB");
+    logger.info("connected to MongoDB");
   })
   .catch((err) => {
-    console.log("error connecting to MongoDB", err.message);
+    logger.error("error connecting to MongoDB", err.message);
   });
 
 const validatePhoneNumber = (phoneNumber) => {

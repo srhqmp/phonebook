@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const middlewares = require("./middlewares/index.js");
+const config = require("./utils/config.js");
+const middlewares = require("./utils/middleware.js");
+const logger = require("./utils/logger.js");
 const Person = require("./models/person.js");
 
 const app = express();
@@ -47,12 +48,6 @@ app.post("/api/persons", (req, res, next) => {
   }
 
   // TODO: Prevent duplicate names
-  // const personExist = persons.find(
-  //   (p) => p.name.toLocaleLowerCase().trim() === body.name.toLowerCase().trim()
-  // );
-  // if (personExist) {
-  //   return res.status(409).json({ message: "name must be unique" });
-  // }
 
   const person = new Person({
     name: body.name,
@@ -109,7 +104,7 @@ app.put("/api/persons/:id", (req, res, next) => {
 app.use(middlewares.unknownEndpoint);
 app.use(middlewares.errorHandler);
 
-const PORT = process.env.PORT || 3001;
+const PORT = config.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on PORT ${PORT}`);
+  logger.info(`Server running on PORT ${PORT}`);
 });
