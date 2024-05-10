@@ -86,6 +86,12 @@ test("a person can be deleted", async () => {
   assert.strictEqual(personsAtEnd.length, personsAtStart.length - 1);
 });
 
+test("fails with statuscode 400 id is invalid", async () => {
+  const invalidId = "5a3d5da59070081a82a3445";
+
+  await api.get(`/api/persons/${invalidId}`).expect(400);
+});
+
 after(async () => {
   mongoose.connection.close();
 });
