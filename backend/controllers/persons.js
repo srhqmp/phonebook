@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 const personsRouter = require("express").Router();
 const Person = require("../models/person.js");
+const User = require("../models/users.js");
 
 personsRouter.get("/info", async (req, res) => {
   const persons = await Person.find({});
@@ -20,6 +21,8 @@ personsRouter.get("/", async (req, res) => {
 personsRouter.post("/", async (req, res, next) => {
   const body = req.body;
 
+  const user = await User.findById(body.userId);
+
   if (!body.name || !body.number) {
     return res.status(400).json({ error: "Must contain name and number" });
   }
@@ -27,9 +30,13 @@ personsRouter.post("/", async (req, res, next) => {
   const person = new Person({
     name: body.name,
     number: body.number,
+    user: user.id,
   });
 
   const newPerson = await person.save();
+  user.contacts = user.contacts.concat(newPerson._id);
+  await user.save();
+
   res.status(201).json(newPerson);
 });
 

@@ -3,5 +3,16 @@ Content-Type: application/json
 
 {
     "name": "Sarah",
-    "number": "09-1234556"
+    "number": "09-1234556",
+    "userId": "663e4f82791b4f319ec4cb63"
+}
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "number": "12-1234556",
+    "userId": "663e4f82791b4f319ec4cb63"
 }
