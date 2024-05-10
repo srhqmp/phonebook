@@ -14,7 +14,10 @@ personsRouter.get("/info", async (req, res) => {
 });
 
 personsRouter.get("/", async (req, res) => {
-  const persons = await Person.find({});
+  const persons = await Person.find({}).populate("user", {
+    username: 1,
+    name: 1,
+  });
   res.json(persons);
 });
 
