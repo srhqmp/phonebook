@@ -59,6 +59,33 @@ test("a valid number can be added", async () => {
   assert(persons.includes(newPerson.name));
 });
 
+test("a specific person can be viewed", async () => {
+  const personsAtStart = await helper.personsInDb();
+
+  const personToView = personsAtStart[0];
+
+  const resultPerson = await api
+    .get(`/api/persons/${personToView.id}`)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.deepStrictEqual(personToView, resultPerson.body);
+});
+
+test("a person can be deleted", async () => {
+  const personsAtStart = await helper.personsInDb();
+
+  const personToDelete = personsAtStart[0];
+
+  await api.delete(`/api/persons/${personToDelete.id}`).expect(204);
+
+  const personsAtEnd = await helper.personsInDb();
+  const persons = personsAtEnd.map((p) => p.name);
+
+  assert(!persons.includes(personToDelete.name));
+  assert.strictEqual(personsAtEnd.length, personsAtStart.length - 1);
+});
+
 after(async () => {
   mongoose.connection.close();
 });
