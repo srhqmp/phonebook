@@ -5,7 +5,9 @@ const morgan = require("morgan");
 require("express-async-errors");
 
 const middlewares = require("./utils/middleware.js");
+
 const usersRouter = require("./controllers/users.js");
+const loginRouter = require("./controllers/login.js");
 const personsRouter = require("./controllers/persons.js");
 
 const app = express();
@@ -23,6 +25,7 @@ app.use(
   )
 );
 
+app.use("/api/login", loginRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/persons", personsRouter);
 

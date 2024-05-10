@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const personsRouter = require("express").Router();
 const Person = require("../models/person.js");
-const User = require("../models/users.js");
+const User = require("../models/user.js");
 
 personsRouter.get("/info", async (req, res) => {
   const persons = await Person.find({});
