@@ -1,7 +1,17 @@
 /* eslint-disable no-unused-vars */
 const personsRouter = require("express").Router();
+const jwt = require("jsonwebtoken");
+
 const Person = require("../models/person.js");
 const User = require("../models/user.js");
+
+const getTokenFrom = (req) => {
+  const authorization = req.get("authorization");
+  if (authorization && authorization.startsWith("Bearer ")) {
+    return authorization.replace("Bearer ", "");
+  }
+  return null;
+};
 
 personsRouter.get("/info", async (req, res) => {
   const persons = await Person.find({});
@@ -23,8 +33,12 @@ personsRouter.get("/", async (req, res) => {
 
 personsRouter.post("/", async (req, res, next) => {
   const body = req.body;
+  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET);
+  if (!decodedToken.id) {
+    return res.status(401).json({ error: "token invalid" });
+  }
 
-  const user = await User.findById(body.userId);
+  const user = await User.findById(decodedToken.id);
 
   if (!body.name || !body.number) {
     return res.status(400).json({ error: "Must contain name and number" });
