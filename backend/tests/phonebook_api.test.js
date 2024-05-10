@@ -4,26 +4,17 @@ const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 
+const helper = require("./test_helper.js");
 const Person = require("../models/person.js");
 const app = require("../app.js");
 
 const api = supertest(app);
 
-const personList = [
-  {
-    name: "Sarah",
-    number: "09-1234567",
-  },
-  {
-    name: "Jane",
-    number: "123-45678912",
-  },
-];
-
 before(async () => {
   await Person.deleteMany({});
+
   await Promise.all(
-    personList.map(async (p) => {
+    helper.initialPersons.map(async (p) => {
       const person = new Person(p);
       await person.save();
     })
@@ -37,9 +28,9 @@ test("phonebook data are returned as json", async () => {
     .expect("Content-Type", /application\/json/);
 });
 
-test("there are two persons", async () => {
+test("all persons are returned", async () => {
   const response = await api.get("/api/persons");
-  assert.strictEqual(response.body.length, 2);
+  assert.strictEqual(response.body.length, helper.initialPersons.length);
 });
 
 test("the first person is named Sarah", async () => {
@@ -61,10 +52,10 @@ test("a valid number can be added", async () => {
     .expect(201)
     .expect("Content-Type", /application\/json/);
 
-  const response = await api.get("/api/persons");
-  const persons = response.body.map((p) => p.name);
+  const personsAtEnd = await helper.personsInDb();
+  assert.strictEqual(personsAtEnd.length, helper.initialPersons.length + 1);
 
-  assert.strictEqual(response.body.length, personList.length + 1);
+  const persons = personsAtEnd.map((p) => p.name);
   assert(persons.includes(newPerson.name));
 });
 
