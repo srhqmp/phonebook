@@ -49,6 +49,25 @@ test("the first person is named Sarah", async () => {
   assert.strictEqual(persons[0], "Sarah");
 });
 
+test("a valid number can be added", async () => {
+  const newPerson = {
+    name: "John Doe",
+    number: "12-1122334",
+  };
+
+  await api
+    .post("/api/persons")
+    .send(newPerson)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const response = await api.get("/api/persons");
+  const persons = response.body.map((p) => p.name);
+
+  assert.strictEqual(response.body.length, personList.length + 1);
+  assert(persons.includes(newPerson.name));
+});
+
 after(async () => {
   mongoose.connection.close();
 });
