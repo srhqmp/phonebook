@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+require("express-async-errors");
 
 const middlewares = require("./utils/middleware.js");
 const personsRouter = require("./controllers/persons.js");
