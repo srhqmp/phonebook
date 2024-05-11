@@ -6,6 +6,7 @@ import Persons from "./components/Persons.jsx";
 import Notification from "./components/Notification.jsx";
 
 import personService from "./services/persons.js";
+import loginService from "./services/login.js";
 
 const App = () => {
   const [persons, setPersons] = useState(null);
@@ -14,11 +15,36 @@ const App = () => {
   const [search, setSearch] = useState("");
   const [notification, setNotification] = useState(null); // {message: "", variant: ""}
 
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
     personService.getAll().then((res) => {
       setPersons(res.data);
     });
   }, []);
+
+  const displayNotification = (message, variant) => {
+    setNotification({ message, variant });
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await loginService.login({ username, password });
+      setUser(response.data);
+      setUsername("");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+      displayNotification("Wrong credentials", "error");
+    }
+  };
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -49,13 +75,6 @@ const App = () => {
         const updatedPersons = persons.filter((p) => p.id !== person.id);
         setPersons(updatedPersons);
       });
-  };
-
-  const displayNotification = (message, variant) => {
-    setNotification({ message, variant });
-    setTimeout(() => {
-      setNotification(null);
-    }, 5000);
   };
 
   const reset = () => {
@@ -120,15 +139,46 @@ const App = () => {
     <div>
       <h1>Phonebook</h1>
       <Notification notification={notification} />
+      {user && <p>{user.name} logged-in</p>}
+      {!user && (
+        <>
+          <h2>Login</h2>
+          <form onSubmit={handleLogin}>
+            <div>
+              username{" "}
+              <input
+                type="text"
+                name="username"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+              />
+            </div>
+            <div>
+              password{" "}
+              <input
+                type="text"
+                name="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </div>
+            <button type="submit">login</button>
+          </form>
+        </>
+      )}
       <Filter value={search} handleSearch={handleSearch} />
-      <h2>Add a new</h2>
-      <PersonForm
-        onSubmit={onSubmit}
-        name={newName}
-        number={newNumber}
-        handleName={handleName}
-        handleNumber={handleNumber}
-      />
+      {user && (
+        <>
+          <h2>Add a new</h2>
+          <PersonForm
+            onSubmit={onSubmit}
+            name={newName}
+            number={newNumber}
+            handleName={handleName}
+            handleNumber={handleNumber}
+          />
+        </>
+      )}
       <h2>Numbers</h2>
       <Persons persons={filteredPersons} handleDelete={handleDelete} />
     </div>
