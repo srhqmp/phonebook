@@ -1,17 +1,8 @@
 /* eslint-disable no-unused-vars */
 const personsRouter = require("express").Router();
-const jwt = require("jsonwebtoken");
 
 const Person = require("../models/person.js");
-const User = require("../models/user.js");
-
-const getTokenFrom = (req) => {
-  const authorization = req.get("authorization");
-  if (authorization && authorization.startsWith("Bearer ")) {
-    return authorization.replace("Bearer ", "");
-  }
-  return null;
-};
+const middleware = require("../utils/middleware.js");
 
 personsRouter.get("/info", async (req, res) => {
   const persons = await Person.find({});
@@ -23,6 +14,7 @@ personsRouter.get("/info", async (req, res) => {
   );
 });
 
+// TODO: make contacts private?
 personsRouter.get("/", async (req, res) => {
   const persons = await Person.find({}).populate("user", {
     username: 1,
@@ -31,14 +23,9 @@ personsRouter.get("/", async (req, res) => {
   res.json(persons);
 });
 
-personsRouter.post("/", async (req, res, next) => {
+personsRouter.post("/", middleware.userExtractor, async (req, res, next) => {
   const body = req.body;
-  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET);
-  if (!decodedToken.id) {
-    return res.status(401).json({ error: "token invalid" });
-  }
-
-  const user = await User.findById(decodedToken.id);
+  const user = req.user;
 
   if (!body.name || !body.number) {
     return res.status(400).json({ error: "Must contain name and number" });
@@ -63,25 +50,48 @@ personsRouter.get("/:id", async (req, res, next) => {
   res.json(person);
 });
 
-personsRouter.delete("/:id", async (req, res, next) => {
+personsRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (req, res, next) => {
+    const id = req.params.id;
+    const user = req.user;
+    const person = await Person.findById(id);
+
+    if (person.user.toString() !== user.id.toString()) {
+      return res
+        .status(401)
+        .json({ error: "You are not authorize to delete this person" });
+    }
+
+    await Person.findByIdAndDelete(id);
+    res.status(204).end();
+  }
+);
+
+personsRouter.put("/:id", middleware.userExtractor, async (req, res, next) => {
   const id = req.params.id;
-  await Person.findByIdAndDelete(id);
-  res.status(204).end();
-});
+  const user = req.user;
+  const person = await Person.findById(id);
 
-personsRouter.put("/:id", async (req, res, next) => {
-  const id = req.params.id;
+  if (person.user.toString() !== user.id.toString()) {
+    return res
+      .status(401)
+      .json({ error: "You are not authorize to update this person" });
+  }
 
-  const person = {
-    name: req.body.name,
-    number: req.body.number,
-  };
-
-  const updatedPerson = await Person.findByIdAndUpdate(id, person, {
-    new: true,
-    runValidators: true,
-    context: "query",
-  });
+  const updatedPerson = await Person.findByIdAndUpdate(
+    id,
+    {
+      name: req.body.name,
+      number: req.body.number,
+    },
+    {
+      new: true,
+      runValidators: true,
+      context: "query",
+    }
+  );
   res.json(updatedPerson);
 });
 
