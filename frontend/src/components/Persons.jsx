@@ -1,4 +1,4 @@
-const Persons = ({ persons, handleDelete }) => {
+const Persons = ({ persons, handleDelete, user }) => {
   const onClick = (person) => () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       handleDelete(person);
@@ -9,7 +9,8 @@ const Persons = ({ persons, handleDelete }) => {
     <div>
       {persons.map((p) => (
         <div key={p.id}>
-          {p.name} {p.number} <button onClick={onClick(p)}>delete</button>
+          {p.name} {p.number}{" "}
+          {user && <button onClick={onClick(p)}>delete</button>}
         </div>
       ))}
     </div>

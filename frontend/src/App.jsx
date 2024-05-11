@@ -25,6 +25,15 @@ const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedPhonebookUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      personService.setToken(user.token);
+    }
+  }, []);
+
   const displayNotification = (message, variant) => {
     setNotification({ message, variant });
     setTimeout(() => {
@@ -37,8 +46,14 @@ const App = () => {
 
     try {
       const response = await loginService.login({ username, password });
-      setUser(response.data);
+
+      window.localStorage.setItem(
+        "loggedPhonebookUser",
+        JSON.stringify(response.data)
+      );
       personService.setToken(response.data.token);
+
+      setUser(response.data);
       setUsername("");
       setPassword("");
     } catch (err) {
@@ -140,7 +155,19 @@ const App = () => {
     <div>
       <h1>Phonebook</h1>
       <Notification notification={notification} />
-      {user && <p>{user.name} logged-in</p>}
+      {user && (
+        <p>
+          {user.name} logged-in{" "}
+          <button
+            onClick={() => {
+              window.localStorage.removeItem("loggedPhonebookUser");
+              setUser(null);
+            }}
+          >
+            logout
+          </button>
+        </p>
+      )}
       {!user && (
         <>
           <h2>Login</h2>
@@ -181,7 +208,11 @@ const App = () => {
         </>
       )}
       <h2>Numbers</h2>
-      <Persons persons={filteredPersons} handleDelete={handleDelete} />
+      <Persons
+        persons={filteredPersons}
+        handleDelete={handleDelete}
+        user={user}
+      />
     </div>
   );
 };
