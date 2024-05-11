@@ -38,6 +38,7 @@ const App = () => {
     try {
       const response = await loginService.login({ username, password });
       setUser(response.data);
+      personService.setToken(response.data.token);
       setUsername("");
       setPassword("");
     } catch (err) {
