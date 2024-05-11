@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const Person = require("../models/person.js");
 const User = require("../models/user.js");
 
@@ -30,4 +32,23 @@ const usersInDb = async () => {
   return users.map((user) => user.toJSON());
 };
 
-module.exports = { initialPersons, nonExistingId, personsInDb, usersInDb };
+const loginUser = async ({ api, username, password }) => {
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = new User({ username, passwordHash });
+  await user.save();
+
+  const response = await api
+    .post("/api/login")
+    .send({ username, password })
+    .expect(200);
+
+  return { ...response.body, id: user.id };
+};
+
+module.exports = {
+  initialPersons,
+  nonExistingId,
+  personsInDb,
+  usersInDb,
+  loginUser,
+};

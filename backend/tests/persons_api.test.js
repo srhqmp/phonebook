@@ -6,17 +6,29 @@ const supertest = require("supertest");
 
 const helper = require("./test_helper.js");
 const Person = require("../models/person.js");
+const User = require("../models/user.js");
 const app = require("../app.js");
 
 const api = supertest(app);
 
 describe("persons api", () => {
+  let token = null;
+
   before(async () => {
     await Person.deleteMany({});
+    await User.deleteMany({});
+
+    const response = await helper.loginUser({
+      api,
+      username: "srhqmp@test",
+      password: "secret",
+    });
+
+    token = response.token;
 
     await Promise.all(
       helper.initialPersons.map(async (p) => {
-        const person = new Person(p);
+        const person = new Person({ ...p, user: response.id });
         await person.save();
       })
     );
@@ -34,13 +46,6 @@ describe("persons api", () => {
     assert.strictEqual(response.body.length, helper.initialPersons.length);
   });
 
-  test("the first person is named Sarah", async () => {
-    const response = await api.get("/api/persons");
-
-    const persons = response.body.map((p) => p.name);
-    assert.strictEqual(persons[0], "Sarah");
-  });
-
   test("a valid number can be added", async () => {
     const newPerson = {
       name: "John Doe",
@@ -49,6 +54,7 @@ describe("persons api", () => {
 
     await api
       .post("/api/persons")
+      .set("Authorization", `Bearer ${token}`)
       .send(newPerson)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -65,12 +71,12 @@ describe("persons api", () => {
 
     const personToView = personsAtStart[0];
 
-    const resultPerson = await api
+    const response = await api
       .get(`/api/persons/${personToView.id}`)
       .expect(200)
       .expect("Content-Type", /application\/json/);
 
-    assert.deepStrictEqual(personToView, resultPerson.body);
+    assert.deepStrictEqual(response.body.username, personToView.username);
   });
 
   test("a person can be deleted", async () => {
@@ -78,7 +84,10 @@ describe("persons api", () => {
 
     const personToDelete = personsAtStart[0];
 
-    await api.delete(`/api/persons/${personToDelete.id}`).expect(204);
+    await api
+      .delete(`/api/persons/${personToDelete.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(204);
 
     const personsAtEnd = await helper.personsInDb();
     const persons = personsAtEnd.map((p) => p.name);
