@@ -1,5 +1,5 @@
 const Person = require("../models/person.js");
-const User = require("../models/users.js");
+const User = require("../models/user.js");
 
 const initialPersons = [
   {
