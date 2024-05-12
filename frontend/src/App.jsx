@@ -20,8 +20,8 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    personService.getAll().then((res) => {
-      setPersons(res.data);
+    personService.getAll().then((data) => {
+      setPersons(data);
     });
   }, []);
 
@@ -45,15 +45,12 @@ const App = () => {
     event.preventDefault();
 
     try {
-      const response = await loginService.login({ username, password });
+      const data = await loginService.login({ username, password });
 
-      window.localStorage.setItem(
-        "loggedPhonebookUser",
-        JSON.stringify(response.data)
-      );
-      personService.setToken(response.data.token);
+      window.localStorage.setItem("loggedPhonebookUser", JSON.stringify(data));
+      personService.setToken(data.token);
 
-      setUser(response.data);
+      setUser(data);
       setUsername("");
       setPassword("");
     } catch (err) {
@@ -123,11 +120,11 @@ const App = () => {
       ) {
         personService
           .update(personExists.id, person)
-          .then((res) => {
+          .then((data) => {
             setPersons((curr) =>
-              curr.map((p) => (p.id === res.data.id ? res.data : p))
+              curr.map((p) => (p.id === data.id ? data : p))
             );
-            displayNotification(`Updated ${res.data.name}`, "success");
+            displayNotification(`Updated ${data.name}`, "success");
             reset();
           })
           .catch((err) => handleError(err));
@@ -137,9 +134,9 @@ const App = () => {
 
     personService
       .create(person)
-      .then((res) => {
-        setPersons((curr) => [...curr, res.data]);
-        displayNotification(`Added ${res.data.name}`, "success");
+      .then((data) => {
+        setPersons((curr) => [...curr, data]);
+        displayNotification(`Added ${data.name}`, "success");
         reset();
       })
       .catch((err) => handleError(err));

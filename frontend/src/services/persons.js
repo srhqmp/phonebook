@@ -9,31 +9,32 @@ const setToken = (newToken) => {
 };
 
 const getAll = () => {
-  return axios.get(baseUrl);
+  const request = axios.get(baseUrl);
+  return request.then((response) => response.data);
 };
 
 const create = (personObject) => {
   const config = {
     headers: { Authorization: token },
   };
-
-  return axios.post(baseUrl, personObject, config);
+  const request = axios.post(baseUrl, personObject, config);
+  return request.then((response) => response.data);
 };
 
 const deleteOne = (id) => {
   const config = {
     headers: { Authorization: token },
   };
-
-  return axios.delete(`${baseUrl}/${id}`, config);
+  const request = axios.delete(`${baseUrl}/${id}`, config);
+  return request.then((response) => response.data);
 };
 
 const update = (id, newObject) => {
   const config = {
     headers: { Authorization: token },
   };
-
-  return axios.put(`${baseUrl}/${id}`, newObject, config);
+  const request = axios.put(`${baseUrl}/${id}`, newObject, config);
+  return request.then((response) => response.data);
 };
 
 export default { getAll, create, deleteOne, update, setToken };
