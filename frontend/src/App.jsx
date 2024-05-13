@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
@@ -18,6 +18,8 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  const contactRef = useRef();
 
   useEffect(() => {
     personService.getAll().then((data) => {
@@ -105,6 +107,7 @@ const App = () => {
               curr.map((p) => (p.id === data.id ? data : p))
             );
             displayNotification(`Updated ${data.name}`, "success");
+            contactRef.current.toggleVisibility();
             return { clearForm: true };
           })
           .catch((err) => handleError(err));
@@ -117,6 +120,7 @@ const App = () => {
       .then((data) => {
         setPersons((curr) => [...curr, data]);
         displayNotification(`Added ${data.name}`, "success");
+        contactRef.current.toggleVisibility();
         return { clearForm: true };
       })
       .catch((err) => handleError(err));
@@ -158,7 +162,7 @@ const App = () => {
       )}
       <Filter value={search} handleSearch={handleSearch} />
       {user && (
-        <Togglable buttonLabel="new contact">
+        <Togglable buttonLabel="new contact" ref={contactRef}>
           <PersonForm createContact={onSubmit} />
         </Togglable>
       )}
