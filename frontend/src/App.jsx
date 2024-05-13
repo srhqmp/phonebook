@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 
 import Filter from './components/Filter.jsx'
 import PersonForm from './components/PersonForm.jsx'
-import Persons from './components/Persons.jsx'
+import Person from './components/Person.jsx'
 import Notification from './components/Notification.jsx'
 import LoginForm from './components/LoginForm.jsx'
 import Togglable from './components/Togglable.jsx'
@@ -168,11 +168,14 @@ const App = () => {
         </Togglable>
       )}
       <h2>Numbers</h2>
-      <Persons
-        persons={filteredPersons}
-        handleDelete={handleDelete}
-        user={user}
-      />
+      {filteredPersons.map((person) => (
+        <Person
+          key={person.id}
+          person={person}
+          handleDelete={handleDelete}
+          user={user}
+        />
+      ))}
     </div>
   )
 }
