@@ -5,6 +5,7 @@ import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
 import Notification from "./components/Notification.jsx";
 import LoginForm from "./components/LoginForm.jsx";
+import Togglable from "./components/Togglable.jsx";
 
 import personService from "./services/persons.js";
 import loginService from "./services/login.js";
@@ -167,18 +168,19 @@ const App = () => {
         </p>
       )}
       {!user && (
-        <LoginForm
-          handleSubmit={handleLogin}
-          username={username}
-          password={password}
-          handleUsernameChange={(event) => setUsername(event.target.value)}
-          handlePasswordChange={(event) => setPassword(event.target.value)}
-        />
+        <Togglable buttonLabel="login">
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+        </Togglable>
       )}
       <Filter value={search} handleSearch={handleSearch} />
       {user && (
-        <>
-          <h2>Add a new</h2>
+        <Togglable buttonLabel="new contact">
           <PersonForm
             onSubmit={onSubmit}
             name={newName}
@@ -186,7 +188,7 @@ const App = () => {
             handleName={handleName}
             handleNumber={handleNumber}
           />
-        </>
+        </Togglable>
       )}
       <h2>Numbers</h2>
       <Persons
