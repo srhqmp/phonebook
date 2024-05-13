@@ -1,35 +1,35 @@
-import { useState, forwardRef, useImperativeHandle } from "react";
+import { useState, forwardRef, useImperativeHandle } from 'react'
 
 const PersonForm = forwardRef(({ createContact }, refs) => {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+  const [name, setName] = useState('')
+  const [number, setNumber] = useState('')
 
   const resetForm = () => {
-    setName("");
-    setNumber("");
-  };
+    setName('')
+    setNumber('')
+  }
 
   useImperativeHandle(refs, () => {
-    return { resetForm };
-  });
+    return { resetForm }
+  })
 
   const addContact = (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     const person = {
       name: name,
       number: number,
-    };
+    }
 
-    createContact(person);
-  };
+    createContact(person)
+  }
 
   return (
     <div>
       <h2>Add a new</h2>
       <form onSubmit={addContact}>
         <div>
-          name:{" "}
+          name:{' '}
           <input
             id="name-input"
             value={name}
@@ -37,7 +37,7 @@ const PersonForm = forwardRef(({ createContact }, refs) => {
           />
         </div>
         <div>
-          number:{" "}
+          number:{' '}
           <input
             id="number-input"
             value={number}
@@ -49,9 +49,9 @@ const PersonForm = forwardRef(({ createContact }, refs) => {
         </div>
       </form>
     </div>
-  );
-});
+  )
+})
 
-PersonForm.displayName = "PersonForm";
+PersonForm.displayName = 'PersonForm'
 
-export default PersonForm;
+export default PersonForm
