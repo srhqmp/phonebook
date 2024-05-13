@@ -4,6 +4,7 @@ import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
 import Notification from "./components/Notification.jsx";
+import LoginForm from "./components/LoginForm.jsx";
 
 import personService from "./services/persons.js";
 import loginService from "./services/login.js";
@@ -166,30 +167,13 @@ const App = () => {
         </p>
       )}
       {!user && (
-        <>
-          <h2>Login</h2>
-          <form onSubmit={handleLogin}>
-            <div>
-              username{" "}
-              <input
-                type="text"
-                name="username"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-              />
-            </div>
-            <div>
-              password{" "}
-              <input
-                type="text"
-                name="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </div>
-            <button type="submit">login</button>
-          </form>
-        </>
+        <LoginForm
+          handleSubmit={handleLogin}
+          username={username}
+          password={password}
+          handleUsernameChange={(event) => setUsername(event.target.value)}
+          handlePasswordChange={(event) => setPassword(event.target.value)}
+        />
       )}
       <Filter value={search} handleSearch={handleSearch} />
       {user && (
