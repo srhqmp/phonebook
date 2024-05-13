@@ -12,8 +12,6 @@ import loginService from "./services/login.js";
 
 const App = () => {
   const [persons, setPersons] = useState(null);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [notification, setNotification] = useState(null); // {message: "", variant: ""}
 
@@ -65,14 +63,6 @@ const App = () => {
     setSearch(event.target.value);
   };
 
-  const handleName = (event) => {
-    setNewName(event.target.value);
-  };
-
-  const handleNumber = (event) => {
-    setNewNumber(event.target.value);
-  };
-
   const handleDelete = (person) => {
     personService
       .deleteOne(person.id)
@@ -92,54 +82,42 @@ const App = () => {
       });
   };
 
-  const reset = () => {
-    setNewName("");
-    setNewNumber("");
-  };
-
   const handleError = (err) => {
     console.error(err);
     displayNotification(err.response.data.error, "error");
   };
 
-  const onSubmit = (event) => {
-    event.preventDefault();
-
+  const onSubmit = (person) => {
     const personExists = persons.find(
-      (p) => p.name.toLowerCase().trim() === newName.toLowerCase().trim()
+      (p) => p.name.toLowerCase().trim() === person.name.toLowerCase().trim()
     );
-
-    const person = {
-      name: newName,
-      number: newNumber,
-    };
 
     if (personExists) {
       if (
         window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`
+          `${person.name} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
-        personService
+        return personService
           .update(personExists.id, person)
           .then((data) => {
             setPersons((curr) =>
               curr.map((p) => (p.id === data.id ? data : p))
             );
             displayNotification(`Updated ${data.name}`, "success");
-            reset();
+            return { clearForm: true };
           })
           .catch((err) => handleError(err));
       }
       return;
     }
 
-    personService
+    return personService
       .create(person)
       .then((data) => {
         setPersons((curr) => [...curr, data]);
         displayNotification(`Added ${data.name}`, "success");
-        reset();
+        return { clearForm: true };
       })
       .catch((err) => handleError(err));
   };
@@ -181,13 +159,7 @@ const App = () => {
       <Filter value={search} handleSearch={handleSearch} />
       {user && (
         <Togglable buttonLabel="new contact">
-          <PersonForm
-            onSubmit={onSubmit}
-            name={newName}
-            number={newNumber}
-            handleName={handleName}
-            handleNumber={handleNumber}
-          />
+          <PersonForm createContact={onSubmit} />
         </Togglable>
       )}
       <h2>Numbers</h2>
