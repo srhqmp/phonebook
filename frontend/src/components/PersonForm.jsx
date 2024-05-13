@@ -1,8 +1,17 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 
-const PersonForm = ({ createContact }) => {
+const PersonForm = forwardRef(({ createContact }, refs) => {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
+
+  const resetForm = () => {
+    setName("");
+    setNumber("");
+  };
+
+  useImperativeHandle(refs, () => {
+    return { resetForm };
+  });
 
   const addContact = (event) => {
     event.preventDefault();
@@ -12,12 +21,7 @@ const PersonForm = ({ createContact }) => {
       number: number,
     };
 
-    createContact(person).then((res) => {
-      if (res.clearForm) {
-        setName("");
-        setNumber("");
-      }
-    });
+    createContact(person);
   };
 
   return (
@@ -44,6 +48,8 @@ const PersonForm = ({ createContact }) => {
       </form>
     </div>
   );
-};
+});
+
+PersonForm.displayName = "PersonForm";
 
 export default PersonForm;

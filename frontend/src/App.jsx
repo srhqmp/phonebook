@@ -20,6 +20,7 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   const contactRef = useRef();
+  const contactFormRef = useRef();
 
   useEffect(() => {
     personService.getAll().then((data) => {
@@ -89,7 +90,7 @@ const App = () => {
     displayNotification(err.response.data.error, "error");
   };
 
-  const onSubmit = (person) => {
+  const createContact = (person) => {
     const personExists = persons.find(
       (p) => p.name.toLowerCase().trim() === person.name.toLowerCase().trim()
     );
@@ -100,28 +101,28 @@ const App = () => {
           `${person.name} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
-        return personService
+        personService
           .update(personExists.id, person)
           .then((data) => {
             setPersons((curr) =>
               curr.map((p) => (p.id === data.id ? data : p))
             );
             displayNotification(`Updated ${data.name}`, "success");
+            contactFormRef.current.resetForm();
             contactRef.current.toggleVisibility();
-            return { clearForm: true };
           })
           .catch((err) => handleError(err));
       }
       return;
     }
 
-    return personService
+    personService
       .create(person)
       .then((data) => {
         setPersons((curr) => [...curr, data]);
         displayNotification(`Added ${data.name}`, "success");
+        contactFormRef.current.resetForm();
         contactRef.current.toggleVisibility();
-        return { clearForm: true };
       })
       .catch((err) => handleError(err));
   };
@@ -163,7 +164,7 @@ const App = () => {
       <Filter value={search} handleSearch={handleSearch} />
       {user && (
         <Togglable buttonLabel="new contact" ref={contactRef}>
-          <PersonForm createContact={onSubmit} />
+          <PersonForm createContact={createContact} ref={contactFormRef} />
         </Togglable>
       )}
       <h2>Numbers</h2>
