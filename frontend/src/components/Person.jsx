@@ -6,7 +6,7 @@ const Person = ({ person, handleDelete, user }) => {
   }
 
   return (
-    <div>
+    <div className="person">
       {person.name} {person.number}
       {user && <button onClick={onClick(person)}>delete</button>}
     </div>
