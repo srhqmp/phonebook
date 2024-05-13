@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import Person from './Person.jsx'
 
 test('renders content', () => {
@@ -7,8 +7,8 @@ test('renders content', () => {
     number: '09-9128374',
   }
 
-  render(<Person person={person} />)
+  const {container} = render(<Person person={person} />)
 
-  const element = screen.getByText('Jane Doe 09-9128374')
-  expect(element).toBeDefined()
+  const div = container.querySelector(".person")
+  expect(div).toHaveTextContent('Jane Doe 09-9128374')
 })
